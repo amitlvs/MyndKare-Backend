@@ -1,0 +1,39 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Use Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: 18.16.1
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build
+      run: npm run build
+
+    - name: Deploy to master
+      if: success()
+      run: |
+        git config --global user.email "your-email@example.com"
+        git config --global user.name "Your Name"
+        git checkout master
+        git pull
+        # Replace this with your deployment script or commands
+        # Example: rsync -av build/ /var/www/html
+        git add .
+        git commit -m "Auto-deploy from development branch"
+        git push
+
